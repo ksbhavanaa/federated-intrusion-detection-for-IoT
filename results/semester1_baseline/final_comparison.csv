@@ -1,0 +1,3 @@
+Approach,Accuracy
+Centralized XGBoost,0.99725
+Federated IDS,0.9942517482517482

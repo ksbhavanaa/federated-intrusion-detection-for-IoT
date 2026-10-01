@@ -1,0 +1,41 @@
+{
+  "project_title": "Privacy Preserving Federated Intrusion Detection Framework for Real-Time IoT Network Security",
+  "version": "2.0.0",
+  "reproducibility": {
+    "random_seed": 42,
+    "framework": "PyTorch 2.9.1 / Python 3.10.11",
+    "dataset": "CICIDS2017 Benchmark & IoT Device Sharding"
+  },
+  "classes": ["Normal", "DDoS", "Botnet", "PortScan", "BruteForce", "WebAttack"],
+  "clients": [
+    { "id": "camera", "name": "Smart Camera", "ip": "192.168.1.101", "emphasis": ["DDoS"] },
+    { "id": "router", "name": "WiFi Router", "ip": "192.168.1.1", "emphasis": ["PortScan"] },
+    { "id": "sensor", "name": "Temperature Sensor", "ip": "192.168.1.103", "emphasis": ["Botnet", "PortScan"] },
+    { "id": "door_lock", "name": "Smart Door Lock", "ip": "192.168.1.104", "emphasis": ["BruteForce"] },
+    { "id": "smart_lighting", "name": "Smart Light Controller", "ip": "192.168.1.105", "emphasis": ["WebAttack"] }
+  ],
+  "federated_parameters": {
+    "algorithm": "Sample-Weighted FedAvg (McMahan et al., 2017)",
+    "rounds": 10,
+    "local_epochs": 5,
+    "batch_size": 256,
+    "learning_rate": 0.001,
+    "optimizer": "Adam",
+    "weight_decay": 0.0001,
+    "architecture": "MLP (Input -> Linear(256) -> BatchNorm -> ReLU -> Dropout(0.3) -> Linear(128) -> BatchNorm -> ReLU -> Dropout(0.3) -> Linear(64) -> BatchNorm -> ReLU -> Dropout(0.3) -> Linear(n_classes))"
+  },
+  "risk_tiers": {
+    "MONITOR": [0.0, 30.0],
+    "ALERT": [30.0, 60.0],
+    "SIMULATED_QUARANTINE": [60.0, 85.0],
+    "SIMULATED_ISOLATION": [85.0, 100.0]
+  },
+  "attack_colors": {
+    "Normal": "#06d6a0",
+    "DDoS": "#ffd166",
+    "PortScan": "#f72585",
+    "Botnet": "#7209b7",
+    "BruteForce": "#f3722c",
+    "WebAttack": "#4cc9f0"
+  }
+}

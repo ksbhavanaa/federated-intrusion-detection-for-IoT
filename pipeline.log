@@ -1,0 +1,401 @@
+2026-09-09 21:08:33,742 [INFO] 
+=================================================================
+2026-09-09 21:08:33,743 [INFO]   PHASE B — DATA PREPROCESSING
+2026-09-09 21:08:33,745 [INFO] =================================================================
+2026-09-09 21:08:36,100 [INFO] Loading CICIDS2017 raw CSVs...
+2026-09-09 21:08:36,100 [INFO]   Reading: Monday.csv
+2026-09-09 21:08:39,113 [INFO]   Reading: Tuesday.csv
+2026-09-09 21:08:41,316 [INFO]   Reading: Wednesday.csv
+2026-09-09 21:08:45,185 [INFO]   Reading: Thursday1.csv
+2026-09-09 21:08:46,074 [INFO]   Reading: Thursday2.csv
+2026-09-09 21:08:47,499 [INFO]   Reading: Friday.csv
+2026-09-09 21:08:48,605 [INFO]   Reading: Friday1.csv
+2026-09-09 21:08:50,898 [INFO] Combined raw shape: (2639710, 79)
+2026-09-09 21:09:06,950 [INFO] Duplicates removed: 289,594
+2026-09-09 21:09:09,057 [INFO] NaN rows dropped: 1,472
+2026-09-09 21:09:15,029 [INFO] Rows with unmapped labels dropped: 47
+2026-09-09 21:09:15,030 [INFO] Class distribution before sampling:
+2026-09-09 21:09:15,149 [INFO]   Normal: 1,924,851
+2026-09-09 21:09:15,149 [INFO]   DDoS: 321,759
+2026-09-09 21:09:15,149 [INFO]   PortScan: 90,694
+2026-09-09 21:09:15,149 [INFO]   BruteForce: 9,150
+2026-09-09 21:09:15,150 [INFO]   WebAttack: 2,143
+2026-09-09 21:09:16,450 [INFO] After stratified sampling: 50,032 rows
+2026-09-09 21:09:16,565 [INFO] Class distribution after sampling (including Botnet augmentation):
+2026-09-09 21:09:16,568 [INFO]   Normal: 40,978
+2026-09-09 21:09:16,568 [INFO]   DDoS: 6,850
+2026-09-09 21:09:16,568 [INFO]   PortScan: 1,930
+2026-09-09 21:09:16,569 [INFO]   Botnet: 1,200
+2026-09-09 21:09:16,569 [INFO]   BruteForce: 194
+2026-09-09 21:09:16,569 [INFO]   WebAttack: 80
+2026-09-09 21:09:16,654 [INFO] Feature count: 78
+2026-09-09 21:09:16,771 [INFO] Train: 35,862  Val: 5,123  Test: 10,247
+2026-09-09 21:09:16,936 [INFO] Leakage validation result: PASSED
+2026-09-09 21:09:16,951 [INFO] Scaler saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\models\scaler.pkl
+2026-09-09 21:09:16,951 [INFO] Encoder saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\models\label_encoder.pkl
+2026-09-09 21:09:16,995 [INFO] Preprocessed splits saved to data/
+2026-09-09 21:09:16,995 [INFO] Preprocessing complete.
+2026-09-09 21:09:17,001 [INFO]   Train=35,862  Val=5,123  Test=10,247
+2026-09-09 21:09:17,001 [INFO]   Features=78  Classes=[np.str_('Botnet'), np.str_('BruteForce'), np.str_('DDoS'), np.str_('Normal'), np.str_('PortScan'), np.str_('WebAttack')]
+2026-09-09 21:09:17,005 [INFO] 
+=================================================================
+2026-09-09 21:09:17,006 [INFO]   PHASE C — CLIENT DATA SPLITTING (Non-IID)
+2026-09-09 21:09:17,006 [INFO] =================================================================
+2026-09-09 21:09:17,013 [INFO] Loading CICIDS2017 raw CSVs...
+2026-09-09 21:09:17,014 [INFO]   Reading: Monday.csv
+2026-09-09 21:09:19,947 [INFO]   Reading: Tuesday.csv
+2026-09-09 21:09:22,207 [INFO]   Reading: Wednesday.csv
+2026-09-09 21:09:25,768 [INFO]   Reading: Thursday1.csv
+2026-09-09 21:09:26,794 [INFO]   Reading: Thursday2.csv
+2026-09-09 21:09:28,129 [INFO]   Reading: Friday.csv
+2026-09-09 21:09:29,173 [INFO]   Reading: Friday1.csv
+2026-09-09 21:09:30,767 [INFO] Combined raw shape: (2639710, 79)
+2026-09-09 21:09:45,344 [INFO] Duplicates removed: 289,594
+2026-09-09 21:09:47,507 [INFO] NaN rows dropped: 1,472
+2026-09-09 21:09:53,517 [INFO] Rows with unmapped labels dropped: 47
+2026-09-09 21:09:53,519 [INFO] Class distribution before sampling:
+2026-09-09 21:09:53,609 [INFO]   Normal: 1,924,851
+2026-09-09 21:09:53,609 [INFO]   DDoS: 321,759
+2026-09-09 21:09:53,609 [INFO]   PortScan: 90,694
+2026-09-09 21:09:53,609 [INFO]   BruteForce: 9,150
+2026-09-09 21:09:53,609 [INFO]   WebAttack: 2,143
+2026-09-09 21:09:55,123 [INFO] After stratified sampling: 50,032 rows
+2026-09-09 21:09:55,231 [INFO] Class distribution after sampling (including Botnet augmentation):
+2026-09-09 21:09:55,235 [INFO]   Normal: 40,978
+2026-09-09 21:09:55,235 [INFO]   DDoS: 6,850
+2026-09-09 21:09:55,236 [INFO]   PortScan: 1,930
+2026-09-09 21:09:55,236 [INFO]   Botnet: 1,200
+2026-09-09 21:09:55,236 [INFO]   BruteForce: 194
+2026-09-09 21:09:55,236 [INFO]   WebAttack: 80
+2026-09-09 21:09:55,328 [INFO] Generating Non-IID partitions across 5 IoT clients...
+2026-09-09 21:09:55,475 [INFO] Client 'camera': 13,176 records | Classes: {'Normal': np.int64(8195), 'DDoS': np.int64(4795), 'PortScan': np.int64(96), 'Botnet': np.int64(60), 'WebAttack': np.int64(15), 'BruteForce': np.int64(15)}
+2026-09-09 21:09:55,476 [INFO] Client 'router': 9,978 records | Classes: {'Normal': np.int64(8195), 'PortScan': np.int64(1351), 'DDoS': np.int64(342), 'Botnet': np.int64(60), 'WebAttack': np.int64(15), 'BruteForce': np.int64(15)}
+2026-09-09 21:09:55,477 [INFO] Client 'sensor': 10,758 records | Classes: {'Normal': np.int64(8195), 'PortScan': np.int64(1351), 'Botnet': np.int64(840), 'DDoS': np.int64(342), 'WebAttack': np.int64(15), 'BruteForce': np.int64(15)}
+2026-09-09 21:09:55,478 [INFO] Client 'door_lock': 8,843 records | Classes: {'Normal': np.int64(8195), 'DDoS': np.int64(342), 'BruteForce': np.int64(135), 'PortScan': np.int64(96), 'Botnet': np.int64(60), 'WebAttack': np.int64(15)}
+2026-09-09 21:09:55,479 [INFO] Client 'smart_lighting': 8,764 records | Classes: {'Normal': np.int64(8195), 'DDoS': np.int64(342), 'PortScan': np.int64(96), 'Botnet': np.int64(60), 'WebAttack': np.int64(56), 'BruteForce': np.int64(15)}
+2026-09-09 21:09:56,125 [INFO] Saved camera data: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\data\camera_data.csv (13,176 rows)
+2026-09-09 21:09:56,599 [INFO] Saved router data: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\data\router_data.csv (9,978 rows)
+2026-09-09 21:09:57,141 [INFO] Saved sensor data: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\data\sensor_data.csv (10,758 rows)
+2026-09-09 21:09:57,592 [INFO] Saved door_lock data: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\data\door_lock_data.csv (8,843 rows)
+2026-09-09 21:09:58,085 [INFO] Saved smart_lighting data: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\data\smart_lighting_data.csv (8,764 rows)
+2026-09-09 21:09:58,550 [INFO] Saved client distribution report: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\client_distribution.csv
+2026-09-09 21:09:58,556 [INFO]   camera: 13,176 samples
+2026-09-09 21:09:58,556 [INFO]   router: 9,978 samples
+2026-09-09 21:09:58,556 [INFO]   sensor: 10,758 samples
+2026-09-09 21:09:58,556 [INFO]   door_lock: 8,843 samples
+2026-09-09 21:09:58,556 [INFO]   smart_lighting: 8,764 samples
+2026-09-09 21:10:00,263 [INFO] 
+=================================================================
+2026-09-09 21:10:00,263 [INFO]   PHASE D1 — CENTRALIZED: RANDOM FOREST
+2026-09-09 21:10:00,263 [INFO] =================================================================
+2026-09-09 21:10:00,604 [INFO] Training Random Forest  n_estimators=100
+2026-09-09 21:10:02,359 [INFO] Classification report saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\classification_reports\Random_Forest_classification_report.txt
+2026-09-09 21:10:02,746 [INFO] Confusion matrix saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\confusion_matrices\Random_Forest_confusion_matrix.png
+2026-09-09 21:10:02,746 [INFO] [Random_Forest] acc=0.9980  p_mac=0.9977  r_mac=0.9791  f1_mac=0.9881  f1_wt=0.9980
+2026-09-09 21:10:02,755 [INFO] Final comparison saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\final_comparison.csv
+2026-09-09 21:10:02,762 [INFO] 
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+  Federated_Neural_Network    0.9701           0.8833        0.8653    0.8404              0.9720           0.9701       0.9677
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+2026-09-09 21:10:02,781 [INFO] Initialized SQLite research database at C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\ids_research.db
+2026-09-09 21:10:02,851 [INFO] RF model saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\models\s2_random_forest.pkl
+2026-09-09 21:10:02,854 [INFO] 
+=================================================================
+2026-09-09 21:10:02,854 [INFO]   PHASE D2 — CENTRALIZED: XGBOOST
+2026-09-09 21:10:02,855 [INFO] =================================================================
+2026-09-09 21:10:02,943 [INFO] Training XGBoost  n=100  depth=6  lr=0.1
+2026-09-09 21:10:06,647 [INFO] Classification report saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\classification_reports\XGBoost_classification_report.txt
+2026-09-09 21:10:06,904 [INFO] Confusion matrix saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\confusion_matrices\XGBoost_confusion_matrix.png
+2026-09-09 21:10:06,904 [INFO] [XGBoost] acc=0.9990  p_mac=0.9978  r_mac=0.9807  f1_mac=0.9889  f1_wt=0.9990
+2026-09-09 21:10:06,921 [INFO] Final comparison saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\final_comparison.csv
+2026-09-09 21:10:06,921 [INFO] 
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+  Federated_Neural_Network    0.9701           0.8833        0.8653    0.8404              0.9720           0.9701       0.9677
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+2026-09-09 21:10:06,941 [INFO] XGBoost model saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\models\s2_xgboost.pkl
+2026-09-09 21:10:06,948 [INFO] 
+=================================================================
+2026-09-09 21:10:06,950 [INFO]   PHASE D3 — CENTRALIZED: PYTORCH NEURAL NETWORK
+2026-09-09 21:10:06,950 [INFO] =================================================================
+2026-09-09 21:10:10,219 [INFO] Device: cpu
+2026-09-09 21:10:10,233 [INFO] Features: 78, Classes: 6 [np.str_('Botnet'), np.str_('BruteForce'), np.str_('DDoS'), np.str_('Normal'), np.str_('PortScan'), np.str_('WebAttack')]
+2026-09-09 21:10:12,297 [INFO] Training Centralized Neural Network for 30 epochs...
+2026-09-09 21:10:13,499 [INFO]   Epoch   1/30  train_loss=0.6896  val_loss=0.2226  val_acc=0.9535
+2026-09-09 21:10:16,957 [INFO]   Epoch   5/30  train_loss=0.1077  val_loss=0.0874  val_acc=0.9627
+2026-09-09 21:10:21,085 [INFO]   Epoch  10/30  train_loss=0.0816  val_loss=0.0691  val_acc=0.9768
+2026-09-09 21:10:25,059 [INFO]   Epoch  15/30  train_loss=0.0644  val_loss=0.0549  val_acc=0.9818
+2026-09-09 21:10:29,224 [INFO]   Epoch  20/30  train_loss=0.0570  val_loss=0.0998  val_acc=0.9680
+2026-09-09 21:10:33,462 [INFO]   Epoch  25/30  train_loss=0.0456  val_loss=0.0829  val_acc=0.9701
+2026-09-09 21:10:37,409 [INFO]   Epoch  30/30  train_loss=0.0392  val_loss=0.0567  val_acc=0.9756
+2026-09-09 21:10:37,420 [INFO] Centralized NN saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\models\s2_neural_network.pth
+2026-09-09 21:10:37,459 [INFO] Classification report saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\classification_reports\Centralized_Neural_Network_classification_report.txt
+2026-09-09 21:10:37,741 [INFO] Confusion matrix saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\confusion_matrices\Centralized_Neural_Network_confusion_matrix.png
+2026-09-09 21:10:37,742 [INFO] [Centralized_Neural_Network] acc=0.9891  p_mac=0.8223  r_mac=0.7875  f1_mac=0.8029  f1_wt=0.9882
+2026-09-09 21:10:37,752 [INFO] Final comparison saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\final_comparison.csv
+2026-09-09 21:10:37,754 [INFO] 
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+  Federated_Neural_Network    0.9701           0.8833        0.8653    0.8404              0.9720           0.9701       0.9677
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+2026-09-09 21:10:37,767 [INFO] 
+Centralized NN  Accuracy=0.9891  F1_weighted=0.9882
+2026-09-09 21:10:37,773 [INFO] Final comparison saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\final_comparison.csv
+2026-09-09 21:10:37,775 [INFO] 
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+2026-09-09 21:10:37,777 [INFO] 
+=================================================================
+2026-09-09 21:10:37,777 [INFO]   PHASE E — TRUE FEDERATED LEARNING (FedAvg)
+2026-09-09 21:10:37,777 [INFO] =================================================================
+2026-09-09 21:10:37,784 [INFO] n_features=78  n_classes=6  classes=[np.str_('Botnet'), np.str_('BruteForce'), np.str_('DDoS'), np.str_('Normal'), np.str_('PortScan'), np.str_('WebAttack')]
+2026-09-09 21:10:37,812 [INFO] Global model initialized on cpu
+2026-09-09 21:10:37,812 [INFO] Model params: 62,662
+2026-09-09 21:10:37,815 [INFO] Test set loaded: 10,247 samples
+2026-09-09 21:10:37,964 [INFO] [camera] Data loaded: train=10,540  val=2,636
+2026-09-09 21:10:38,062 [INFO] [router] Data loaded: train=7,982  val=1,996
+2026-09-09 21:10:38,169 [INFO] [sensor] Data loaded: train=8,606  val=2,152
+2026-09-09 21:10:38,335 [INFO] [door_lock] Data loaded: train=7,074  val=1,769
+2026-09-09 21:10:38,425 [INFO] [smart_lighting] Data loaded: train=7,011  val=1,753
+2026-09-09 21:10:38,428 [INFO] ============================================================
+2026-09-09 21:10:38,428 [INFO] STARTING FEDERATED TRAINING
+2026-09-09 21:10:38,429 [INFO]   Clients  : ['camera', 'router', 'sensor', 'door_lock', 'smart_lighting']
+2026-09-09 21:10:38,429 [INFO]   Rounds   : 10
+2026-09-09 21:10:38,429 [INFO]   L-epochs : 5
+2026-09-09 21:10:38,429 [INFO]   Batch    : 256
+2026-09-09 21:10:38,429 [INFO]   LR       : 0.001
+2026-09-09 21:10:38,429 [INFO] ============================================================
+2026-09-09 21:10:38,474 [INFO] [Round 0 / Init] Accuracy=0.0337  F1=0.0035
+2026-09-09 21:10:38,574 [INFO]   ROUND 1/10
+2026-09-09 21:10:40,104 [INFO] [camera] Local training done | train_loss=0.1250  val_loss=0.1144  val_acc=0.9621
+2026-09-09 21:10:40,105 [INFO]   [camera] n=10,540  train_loss=0.1250  val_acc=0.9621
+2026-09-09 21:10:41,187 [INFO] [router] Local training done | train_loss=0.1454  val_loss=0.1246  val_acc=0.9659
+2026-09-09 21:10:41,188 [INFO]   [router] n=7,982  train_loss=0.1454  val_acc=0.9659
+2026-09-09 21:10:42,307 [INFO] [sensor] Local training done | train_loss=0.1320  val_loss=0.1119  val_acc=0.9717
+2026-09-09 21:10:42,307 [INFO]   [sensor] n=8,606  train_loss=0.1320  val_acc=0.9717
+2026-09-09 21:10:43,232 [INFO] [door_lock] Local training done | train_loss=0.1675  val_loss=0.1184  val_acc=0.9666
+2026-09-09 21:10:43,248 [INFO]   [door_lock] n=7,074  train_loss=0.1675  val_acc=0.9666
+2026-09-09 21:10:44,162 [INFO] [smart_lighting] Local training done | train_loss=0.1370  val_loss=0.1092  val_acc=0.9738
+2026-09-09 21:10:44,218 [INFO]   [smart_lighting] n=7,011  train_loss=0.1370  val_acc=0.9738
+2026-09-09 21:10:44,267 [INFO] 
+  [Round 1] Global Accuracy=0.9534  F1_weighted=0.9505  F1_macro=0.6121  elapsed=5.8s
+2026-09-09 21:10:44,267 [INFO]   ROUND 2/10
+2026-09-09 21:10:45,650 [INFO] [camera] Local training done | train_loss=0.0923  val_loss=0.0918  val_acc=0.9681
+2026-09-09 21:10:45,650 [INFO]   [camera] n=10,540  train_loss=0.0923  val_acc=0.9681
+2026-09-09 21:10:46,702 [INFO] [router] Local training done | train_loss=0.0974  val_loss=0.0944  val_acc=0.9689
+2026-09-09 21:10:46,702 [INFO]   [router] n=7,982  train_loss=0.0974  val_acc=0.9689
+2026-09-09 21:10:47,817 [INFO] [sensor] Local training done | train_loss=0.0891  val_loss=0.0829  val_acc=0.9749
+2026-09-09 21:10:47,817 [INFO]   [sensor] n=8,606  train_loss=0.0891  val_acc=0.9749
+2026-09-09 21:10:48,709 [INFO] [door_lock] Local training done | train_loss=0.0837  val_loss=0.0563  val_acc=0.9785
+2026-09-09 21:10:48,709 [INFO]   [door_lock] n=7,074  train_loss=0.0837  val_acc=0.9785
+2026-09-09 21:10:49,683 [INFO] [smart_lighting] Local training done | train_loss=0.0714  val_loss=0.0737  val_acc=0.9772
+2026-09-09 21:10:49,683 [INFO]   [smart_lighting] n=7,011  train_loss=0.0714  val_acc=0.9772
+2026-09-09 21:10:49,730 [INFO] 
+  [Round 2] Global Accuracy=0.9605  F1_weighted=0.9584  F1_macro=0.6198  elapsed=5.5s
+2026-09-09 21:10:49,738 [INFO]   ROUND 3/10
+2026-09-09 21:10:51,307 [INFO] [camera] Local training done | train_loss=0.0779  val_loss=0.0783  val_acc=0.9685
+2026-09-09 21:10:51,308 [INFO]   [camera] n=10,540  train_loss=0.0779  val_acc=0.9685
+2026-09-09 21:10:52,432 [INFO] [router] Local training done | train_loss=0.0846  val_loss=0.0839  val_acc=0.9719
+2026-09-09 21:10:52,432 [INFO]   [router] n=7,982  train_loss=0.0846  val_acc=0.9719
+2026-09-09 21:10:53,533 [INFO] [sensor] Local training done | train_loss=0.0750  val_loss=0.0724  val_acc=0.9758
+2026-09-09 21:10:53,533 [INFO]   [sensor] n=8,606  train_loss=0.0750  val_acc=0.9758
+2026-09-09 21:10:54,472 [INFO] [door_lock] Local training done | train_loss=0.0688  val_loss=0.0471  val_acc=0.9791
+2026-09-09 21:10:54,473 [INFO]   [door_lock] n=7,074  train_loss=0.0688  val_acc=0.9791
+2026-09-09 21:10:55,383 [INFO] [smart_lighting] Local training done | train_loss=0.0590  val_loss=0.0689  val_acc=0.9795
+2026-09-09 21:10:55,383 [INFO]   [smart_lighting] n=7,011  train_loss=0.0590  val_acc=0.9795
+2026-09-09 21:10:55,427 [INFO] 
+  [Round 3] Global Accuracy=0.9654  F1_weighted=0.9634  F1_macro=0.6250  elapsed=5.7s
+2026-09-09 21:10:55,429 [INFO]   ROUND 4/10
+2026-09-09 21:10:56,804 [INFO] [camera] Local training done | train_loss=0.0688  val_loss=0.0662  val_acc=0.9700
+2026-09-09 21:10:56,805 [INFO]   [camera] n=10,540  train_loss=0.0688  val_acc=0.9700
+2026-09-09 21:10:57,914 [INFO] [router] Local training done | train_loss=0.0763  val_loss=0.0756  val_acc=0.9739
+2026-09-09 21:10:57,915 [INFO]   [router] n=7,982  train_loss=0.0763  val_acc=0.9739
+2026-09-09 21:10:59,008 [INFO] [sensor] Local training done | train_loss=0.0652  val_loss=0.0677  val_acc=0.9768
+2026-09-09 21:10:59,008 [INFO]   [sensor] n=8,606  train_loss=0.0652  val_acc=0.9768
+2026-09-09 21:10:59,961 [INFO] [door_lock] Local training done | train_loss=0.0593  val_loss=0.0416  val_acc=0.9802
+2026-09-09 21:10:59,961 [INFO]   [door_lock] n=7,074  train_loss=0.0593  val_acc=0.9802
+2026-09-09 21:11:00,872 [INFO] [smart_lighting] Local training done | train_loss=0.0521  val_loss=0.0665  val_acc=0.9800
+2026-09-09 21:11:00,873 [INFO]   [smart_lighting] n=7,011  train_loss=0.0521  val_acc=0.9800
+2026-09-09 21:11:00,920 [INFO] 
+  [Round 4] Global Accuracy=0.9687  F1_weighted=0.9681  F1_macro=0.7190  elapsed=5.5s
+2026-09-09 21:11:00,922 [INFO]   ROUND 5/10
+2026-09-09 21:11:02,458 [INFO] [camera] Local training done | train_loss=0.0636  val_loss=0.0638  val_acc=0.9712
+2026-09-09 21:11:02,458 [INFO]   [camera] n=10,540  train_loss=0.0636  val_acc=0.9712
+2026-09-09 21:11:03,529 [INFO] [router] Local training done | train_loss=0.0675  val_loss=0.0750  val_acc=0.9760
+2026-09-09 21:11:03,529 [INFO]   [router] n=7,982  train_loss=0.0675  val_acc=0.9760
+2026-09-09 21:11:04,629 [INFO] [sensor] Local training done | train_loss=0.0587  val_loss=0.0661  val_acc=0.9786
+2026-09-09 21:11:04,630 [INFO]   [sensor] n=8,606  train_loss=0.0587  val_acc=0.9786
+2026-09-09 21:11:05,586 [INFO] [door_lock] Local training done | train_loss=0.0524  val_loss=0.0366  val_acc=0.9876
+2026-09-09 21:11:05,586 [INFO]   [door_lock] n=7,074  train_loss=0.0524  val_acc=0.9876
+2026-09-09 21:11:06,477 [INFO] [smart_lighting] Local training done | train_loss=0.0466  val_loss=0.0621  val_acc=0.9800
+2026-09-09 21:11:06,477 [INFO]   [smart_lighting] n=7,011  train_loss=0.0466  val_acc=0.9800
+2026-09-09 21:11:06,525 [INFO] 
+  [Round 5] Global Accuracy=0.9762  F1_weighted=0.9756  F1_macro=0.7756  elapsed=5.6s
+2026-09-09 21:11:06,525 [INFO]   ROUND 6/10
+2026-09-09 21:11:07,916 [INFO] [camera] Local training done | train_loss=0.0591  val_loss=0.0555  val_acc=0.9712
+2026-09-09 21:11:07,917 [INFO]   [camera] n=10,540  train_loss=0.0591  val_acc=0.9712
+2026-09-09 21:11:08,921 [INFO] [router] Local training done | train_loss=0.0631  val_loss=0.0699  val_acc=0.9775
+2026-09-09 21:11:08,921 [INFO]   [router] n=7,982  train_loss=0.0631  val_acc=0.9775
+2026-09-09 21:11:10,044 [INFO] [sensor] Local training done | train_loss=0.0538  val_loss=0.0646  val_acc=0.9879
+2026-09-09 21:11:10,050 [INFO]   [sensor] n=8,606  train_loss=0.0538  val_acc=0.9879
+2026-09-09 21:11:11,033 [INFO] [door_lock] Local training done | train_loss=0.0478  val_loss=0.0331  val_acc=0.9864
+2026-09-09 21:11:11,034 [INFO]   [door_lock] n=7,074  train_loss=0.0478  val_acc=0.9864
+2026-09-09 21:11:11,983 [INFO] [smart_lighting] Local training done | train_loss=0.0436  val_loss=0.0638  val_acc=0.9800
+2026-09-09 21:11:11,983 [INFO]   [smart_lighting] n=7,011  train_loss=0.0436  val_acc=0.9800
+2026-09-09 21:11:12,061 [INFO] 
+  [Round 6] Global Accuracy=0.9820  F1_weighted=0.9810  F1_macro=0.7854  elapsed=5.5s
+2026-09-09 21:11:12,063 [INFO]   ROUND 7/10
+2026-09-09 21:11:13,953 [INFO] [camera] Local training done | train_loss=0.0535  val_loss=0.0530  val_acc=0.9715
+2026-09-09 21:11:13,954 [INFO]   [camera] n=10,540  train_loss=0.0535  val_acc=0.9715
+2026-09-09 21:11:15,265 [INFO] [router] Local training done | train_loss=0.0562  val_loss=0.0667  val_acc=0.9830
+2026-09-09 21:11:15,265 [INFO]   [router] n=7,982  train_loss=0.0562  val_acc=0.9830
+2026-09-09 21:11:16,657 [INFO] [sensor] Local training done | train_loss=0.0470  val_loss=0.0974  val_acc=0.9498
+2026-09-09 21:11:16,657 [INFO]   [sensor] n=8,606  train_loss=0.0470  val_acc=0.9498
+2026-09-09 21:11:17,810 [INFO] [door_lock] Local training done | train_loss=0.0428  val_loss=0.0321  val_acc=0.9881
+2026-09-09 21:11:17,812 [INFO]   [door_lock] n=7,074  train_loss=0.0428  val_acc=0.9881
+2026-09-09 21:11:18,955 [INFO] [smart_lighting] Local training done | train_loss=0.0398  val_loss=0.0584  val_acc=0.9817
+2026-09-09 21:11:18,956 [INFO]   [smart_lighting] n=7,011  train_loss=0.0398  val_acc=0.9817
+2026-09-09 21:11:19,009 [INFO] 
+  [Round 7] Global Accuracy=0.9811  F1_weighted=0.9807  F1_macro=0.8762  elapsed=6.9s
+2026-09-09 21:11:19,011 [INFO]   ROUND 8/10
+2026-09-09 21:11:20,784 [INFO] [camera] Local training done | train_loss=0.0527  val_loss=0.0533  val_acc=0.9715
+2026-09-09 21:11:20,784 [INFO]   [camera] n=10,540  train_loss=0.0527  val_acc=0.9715
+2026-09-09 21:11:22,083 [INFO] [router] Local training done | train_loss=0.0490  val_loss=0.1023  val_acc=0.9439
+2026-09-09 21:11:22,083 [INFO]   [router] n=7,982  train_loss=0.0490  val_acc=0.9439
+2026-09-09 21:11:23,346 [INFO] [sensor] Local training done | train_loss=0.0417  val_loss=0.0962  val_acc=0.9512
+2026-09-09 21:11:23,346 [INFO]   [sensor] n=8,606  train_loss=0.0417  val_acc=0.9512
+2026-09-09 21:11:24,417 [INFO] [door_lock] Local training done | train_loss=0.0404  val_loss=0.0323  val_acc=0.9887
+2026-09-09 21:11:24,417 [INFO]   [door_lock] n=7,074  train_loss=0.0404  val_acc=0.9887
+2026-09-09 21:11:25,576 [INFO] [smart_lighting] Local training done | train_loss=0.0376  val_loss=0.0626  val_acc=0.9835
+2026-09-09 21:11:25,576 [INFO]   [smart_lighting] n=7,011  train_loss=0.0376  val_acc=0.9835
+2026-09-09 21:11:25,642 [INFO] 
+  [Round 8] Global Accuracy=0.9726  F1_weighted=0.9707  F1_macro=0.8473  elapsed=6.6s
+2026-09-09 21:11:25,644 [INFO]   ROUND 9/10
+2026-09-09 21:11:27,229 [INFO] [camera] Local training done | train_loss=0.0472  val_loss=0.0512  val_acc=0.9753
+2026-09-09 21:11:27,229 [INFO]   [camera] n=10,540  train_loss=0.0472  val_acc=0.9753
+2026-09-09 21:11:28,378 [INFO] [router] Local training done | train_loss=0.0445  val_loss=0.1235  val_acc=0.9319
+2026-09-09 21:11:28,380 [INFO]   [router] n=7,982  train_loss=0.0445  val_acc=0.9319
+2026-09-09 21:11:29,648 [INFO] [sensor] Local training done | train_loss=0.0399  val_loss=0.1669  val_acc=0.9298
+2026-09-09 21:11:29,648 [INFO]   [sensor] n=8,606  train_loss=0.0399  val_acc=0.9298
+2026-09-09 21:11:30,674 [INFO] [door_lock] Local training done | train_loss=0.0366  val_loss=0.0344  val_acc=0.9836
+2026-09-09 21:11:30,676 [INFO]   [door_lock] n=7,074  train_loss=0.0366  val_acc=0.9836
+2026-09-09 21:11:31,741 [INFO] [smart_lighting] Local training done | train_loss=0.0359  val_loss=0.0671  val_acc=0.9823
+2026-09-09 21:11:31,741 [INFO]   [smart_lighting] n=7,011  train_loss=0.0359  val_acc=0.9823
+2026-09-09 21:11:31,797 [INFO] 
+  [Round 9] Global Accuracy=0.9701  F1_weighted=0.9676  F1_macro=0.8418  elapsed=6.2s
+2026-09-09 21:11:31,797 [INFO]   ROUND 10/10
+2026-09-09 21:11:33,440 [INFO] [camera] Local training done | train_loss=0.0457  val_loss=0.0515  val_acc=0.9757
+2026-09-09 21:11:33,442 [INFO]   [camera] n=10,540  train_loss=0.0457  val_acc=0.9757
+2026-09-09 21:11:34,611 [INFO] [router] Local training done | train_loss=0.0414  val_loss=0.1876  val_acc=0.9274
+2026-09-09 21:11:34,611 [INFO]   [router] n=7,982  train_loss=0.0414  val_acc=0.9274
+2026-09-09 21:11:35,921 [INFO] [sensor] Local training done | train_loss=0.0369  val_loss=0.1630  val_acc=0.9215
+2026-09-09 21:11:35,921 [INFO]   [sensor] n=8,606  train_loss=0.0369  val_acc=0.9215
+2026-09-09 21:11:37,019 [INFO] [door_lock] Local training done | train_loss=0.0356  val_loss=0.0339  val_acc=0.9813
+2026-09-09 21:11:37,019 [INFO]   [door_lock] n=7,074  train_loss=0.0356  val_acc=0.9813
+2026-09-09 21:11:38,193 [INFO] [smart_lighting] Local training done | train_loss=0.0333  val_loss=0.0550  val_acc=0.9812
+2026-09-09 21:11:38,194 [INFO]   [smart_lighting] n=7,011  train_loss=0.0333  val_acc=0.9812
+2026-09-09 21:11:38,246 [INFO] 
+  [Round 10] Global Accuracy=0.9701  F1_weighted=0.9677  F1_macro=0.8404  elapsed=6.4s
+2026-09-09 21:11:38,250 [INFO] 
+Round results saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\federated_round_results.csv
+2026-09-09 21:11:38,253 [INFO] Global model saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\models\federated_global_model.pth
+2026-09-09 21:11:38,253 [INFO] 
+============================================================
+2026-09-09 21:11:38,253 [INFO] FEDERATED TRAINING COMPLETE
+2026-09-09 21:11:38,253 [INFO]   Final Accuracy   : 0.9701
+2026-09-09 21:11:38,254 [INFO]   Final F1 Macro   : 0.8404
+2026-09-09 21:11:38,254 [INFO]   Final F1 Weighted: 0.9677
+2026-09-09 21:11:38,254 [INFO] ============================================================
+2026-09-09 21:11:38,256 [INFO]   Final Federated Accuracy: 0.9701
+2026-09-09 21:11:38,257 [INFO]   Final F1 Weighted:        0.9677
+2026-09-09 21:11:38,257 [INFO] 
+=================================================================
+2026-09-09 21:11:38,257 [INFO]   PHASE G — EVALUATION & FINAL COMPARISON
+2026-09-09 21:11:38,257 [INFO] =================================================================
+2026-09-09 21:11:38,342 [INFO] Classification report saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\classification_reports\Federated_Neural_Network_classification_report.txt
+2026-09-09 21:11:38,595 [INFO] Confusion matrix saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\confusion_matrices\Federated_Neural_Network_confusion_matrix.png
+2026-09-09 21:11:38,596 [INFO] [Federated_Neural_Network] acc=0.9701  p_mac=0.8833  r_mac=0.8653  f1_mac=0.8404  f1_wt=0.9677
+2026-09-09 21:11:38,607 [INFO] Final comparison saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\final_comparison.csv
+2026-09-09 21:11:38,610 [INFO] 
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+  Federated_Neural_Network    0.9701           0.8833        0.8653    0.8404              0.9720           0.9701       0.9677
+2026-09-09 21:11:38,648 [INFO] Final comparison saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\final_comparison.csv
+2026-09-09 21:11:38,651 [INFO] 
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+  Federated_Neural_Network    0.9701           0.8833        0.8653    0.8404              0.9720           0.9701       0.9677
+2026-09-09 21:11:38,652 [INFO] 
+=================================================================
+2026-09-09 21:11:38,652 [INFO]   PHASE H — VISUALIZATION
+2026-09-09 21:11:38,652 [INFO] =================================================================
+2026-09-09 21:11:38,660 [INFO] Generating all visualizations...
+2026-09-09 21:11:38,844 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\01_model_comparison.png
+2026-09-09 21:11:39,141 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\02_precision_recall.png
+2026-09-09 21:11:39,452 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\03_federated_rounds.png
+2026-09-09 21:11:39,734 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\federated_convergence.png
+2026-09-09 21:11:39,958 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\04_client_distribution.png
+2026-09-09 21:11:40,143 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\05_attack_distribution.png
+2026-09-09 21:11:40,291 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\06_federated_loss.png
+2026-09-09 21:11:40,419 [INFO] Saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures\07_centralized_vs_federated.png
+2026-09-09 21:11:40,419 [INFO] All figures saved to: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\figures
+2026-09-09 21:11:40,419 [INFO] 
+=================================================================
+2026-09-09 21:11:40,419 [INFO]   PHASE L — EXPLAINABLE AI (SHAP)
+2026-09-09 21:11:40,419 [INFO] =================================================================
+2026-09-09 21:11:40,484 [WARNING]   SHAP step failed: cannot import name 'explain_xgboost' from 'src.explainability.shap_explainer' (C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\src\explainability\shap_explainer.py)
+2026-09-09 21:11:40,484 [INFO] 
+=================================================================
+2026-09-09 21:11:40,484 [INFO]   PHASE M — EXPERIMENT SUMMARY
+2026-09-09 21:11:40,484 [INFO] =================================================================
+2026-09-09 21:11:40,495 [INFO] Federated IDS — Experiment Summary
+Generated: 2026-09-09T21:11:40.484548
+============================================================
+
+DATASET
+  Source: CICIDS2017 + IoT device simulation
+  Classes: Normal, DDoS, PortScan, BruteForce, WebAttack (5)
+
+CLIENT DISTRIBUTION
+        Client  Total_Samples  Num_Classes
+        camera          13176            6
+        router           9978            6
+        sensor          10758            6
+     door_lock           8843            6
+smart_lighting           8764            6
+
+MODEL COMPARISON
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+  Federated_Neural_Network    0.9701           0.8833        0.8653    0.8404              0.9720           0.9701       0.9677
+
+FEDERATED TRAINING
+  Rounds: 10
+  Final Global Accuracy:    0.9701
+  Final F1 Weighted:        0.9677
+  Final F1 Macro:           0.8404
+
+HOW TO RUN
+  Full pipeline:        python run_pipeline.py
+  Dashboard:            python src/dashboard/app.py
+  Tests:                python -m pytest tests/ -v
+2026-09-09 21:11:40,495 [INFO] 
+  Summary saved: C:\Users\KS BHAVANA\OneDrive\Desktop\federated_ids\results\experiment_summary.txt
+2026-09-09 21:11:40,495 [INFO] 
+=================================================================
+2026-09-09 21:11:40,495 [INFO]   PIPELINE COMPLETE in 3.1 minutes
+2026-09-09 21:11:40,495 [INFO] =================================================================
+2026-09-09 21:11:40,495 [INFO]   Dashboard: python src/dashboard/app.py
+2026-09-09 21:11:40,495 [INFO]   Tests:     python -m pytest tests/ -v

@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Preserving Federated IDS — SOC Platform</title>
+<meta name="description" content="Decentralized Real-Time Intrusion Detection System for IoT Networks with Federated Learning and Explainable AI">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<style>
+  :root {
+    --bg-base:      #0b0d17;
+    --bg-surface:   #131625;
+    --bg-card:      #1a1d30;
+    --bg-card-hover:#22263d;
+    --border:       #242942;
+    --border-light: #343a5c;
+    
+    --text-main:    #e6e9f2;
+    --text-muted:   #8a94b8;
+    --text-dark:    #555e7e;
+
+    /* Semantic Attack Colors (Required Consistency) */
+    --c-normal:     #06d6a0; /* Green */
+    --c-ddos:       #ffd166; /* Yellow */
+    --c-portscan:   #f72585; /* Pink */
+    --c-botnet:     #7209b7; /* Purple */
+    --c-bruteforce: #f3722c; /* Orange */
+    --c-webattack:  #4cc9f0; /* Blue */
+    --c-danger:     #ef233c; /* Red */
+    
+    --shadow:       0 8px 30px rgba(0,0,0,0.35);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg-base); color:var(--text-main); font-family:'Inter',sans-serif; display:flex; height:100vh; overflow:hidden; }
+
+  /* ── Sidebar ── */
+  .sidebar {
+    width: 260px; background: var(--bg-surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; flex-shrink: 0; z-index: 10;
+  }
+  .sidebar-header {
+    padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;
+  }
+  .brand-shield {
+    width: 36px; height: 36px; border-radius: 8px; background: linear-gradient(135deg, var(--c-webattack), var(--c-botnet));
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+  }
+  .sidebar-nav { list-style: none; padding: 16px 12px; overflow-y: auto; flex-grow: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 8px;
+    font-size: 0.85rem; font-weight: 500; color: var(--text-muted); cursor: pointer;
+    transition: all 0.2s; margin-bottom: 4px;
+  }
+  .nav-item:hover { background: rgba(76,201,240,0.08); color: var(--text-main); }
+  .nav-item.active { background: linear-gradient(90deg, rgba(76,201,240,0.18), rgba(114,9,183,0.12)); color: var(--c-webattack); font-weight: 600; border-left: 3px solid var(--c-webattack); }
+  .nav-icon { font-size: 1.1rem; width: 20px; text-align: center; }
+
+  .sidebar-footer { padding: 16px; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--text-dark); line-height: 1.4; }
+
+  /* ── Main Workspace ── */
+  .workspace { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
+  
+  /* Topbar */
+  .topbar {
+    height: 60px; background: var(--bg-surface); border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between; padding: 0 24px; flex-shrink: 0;
+  }
+  .topbar-title { font-size: 1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .topbar-actions { display: flex; align-items: center; gap: 14px; }
+  .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+  .badge-online { background: rgba(6,214,160,0.15); color: var(--c-normal); border: 1px solid rgba(6,214,160,0.3); }
+  .status-pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--c-normal); animation: pulse 2s infinite; display: inline-block; margin-right: 4px; }
+  @keyframes pulse { 0%,100%{opacity:1; transform:scale(1);} 50%{opacity:0.4; transform:scale(1.2);} }
+
+  .btn {
+    padding: 7px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer;
+    font-family: 'Inter', sans-serif; transition: all 0.2s; border: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: linear-gradient(135deg, var(--c-webattack), var(--c-botnet)); color: white; }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-outline { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); }
+  .btn-outline:hover { background: var(--bg-card); color: var(--text-main); }
+  .btn-danger { background: rgba(239,35,60,0.15); border: 1px solid rgba(239,35,60,0.3); color: var(--c-danger); }
+  .btn-danger:hover { background: var(--c-danger); color: white; }
+
+  /* Content Scrollable */
+  .tab-content { padding: 24px; overflow-y: auto; flex-grow: 1; display: none; }
+  .tab-content.active { display: block; }
+
+  /* Grid Layouts */
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 20px; }
+  @media(max-width: 1200px) { .grid-5,.grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-2,.grid-3 { grid-template-columns: 1fr; } }
+
+  /* Cards */
+  .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin-bottom: 20px; }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .card-title { font-size: 0.9rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+  .card-title::before { content:''; width:3px; height:16px; background: var(--c-webattack); border-radius:2px; }
+
+  /* Stat Widget */
+  .stat-widget { background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .stat-label { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 1.6rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .stat-sub { font-size: 0.7rem; color: var(--text-dark); }
+
+  /* Device Fleet Cards */
+  .device-card {
+    background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
+    display: flex; flex-direction: column; gap: 10px; position: relative; overflow: hidden;
+  }
+  .device-card::before { content:''; position: absolute; top:0; left:0; right:0; height:3px; background: var(--c-normal); }
+  .device-card.alert-mode::before { background: var(--c-danger); }
+  .device-icon { font-size: 1.8rem; }
+  .device-meta { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--text-muted); }
+  .risk-bar { height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .risk-bar-fill { height: 100%; transition: width 0.3s; }
+
+  /* Tables */
+  .table-responsive { width: 100%; overflow-x: auto; }
+  table.soc-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+  table.soc-table th { text-align: left; padding: 10px 12px; color: var(--text-muted); font-weight: 500; border-bottom: 1px solid var(--border); }
+  table.soc-table td { padding: 9px 12px; border-bottom: 1px solid rgba(36,41,66,0.6); }
+  table.soc-table tr:hover td { background: rgba(76,201,240,0.03); }
+
+  /* Badges & Attack Colors */
+  .badge-atk { padding: 3px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+  .atk-Normal     { background: rgba(6,214,160,0.15); color: var(--c-normal); }
+  .atk-DDoS       { background: rgba(255,209,102,0.18); color: var(--c-ddos); }
+  .atk-PortScan   { background: rgba(247,37,133,0.18); color: var(--c-portscan); }
+  .atk-Botnet     { background: rgba(114,9,183,0.2); color: #b5179e; }
+  .atk-BruteForce { background: rgba(243,114,44,0.18); color: var(--c-bruteforce); }
+  .atk-WebAttack  { background: rgba(76,201,240,0.18); color: var(--c-webattack); }
+
+  /* Form Elements */
+  .form-group { margin-bottom: 14px; }
+  .form-label { display: block; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 6px; }
+  .form-control {
+    width: 100%; background: var(--bg-surface); border: 1px solid var(--border-light);
+    border-radius: 6px; padding: 8px 12px; color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 0.82rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Navigation Sidebar ── -->
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <div class="brand-shield">🛡️</div>
+    <div>
+      <div style="font-weight:700; font-size:0.95rem;">Federated IDS</div>
+      <div style="font-size:0.7rem; color:var(--text-muted);">IoT Privacy Platform</div>
+    </div>
+  </div>
+  <ul class="sidebar-nav">
+    <li class="nav-item active" onclick="switchTab('tab-overview')"><span class="nav-icon">📊</span> Overview</li>
+    <li class="nav-item" onclick="switchTab('tab-live-ids')"><span class="nav-icon">⚡</span> Live Threat IDS</li>
+    <li class="nav-item" onclick="switchTab('tab-fleet')"><span class="nav-icon">📡</span> IoT Device Fleet</li>
+    <li class="nav-item" onclick="switchTab('tab-federated')"><span class="nav-icon">🔄</span> Federated Learning</li>
+    <li class="nav-item" onclick="switchTab('tab-xai')"><span class="nav-icon">🧠</span> Explainable AI (Gradient × Input)</li>
+    <li class="nav-item" onclick="switchTab('tab-alerts')"><span class="nav-icon">🚨</span> Security Alerts</li>
+    <li class="nav-item" onclick="switchTab('tab-analytics')"><span class="nav-icon">📈</span> Analytics & Benchmarks</li>
+    <li class="nav-item" onclick="switchTab('tab-experiments')"><span class="nav-icon">🧪</span> Research Experiments</li>
+  </ul>
+  <div class="sidebar-footer">
+    B.Tech Major Project<br>
+    <b>Title:</b> Privacy Preserving Federated IDS<br>
+    <b>Status:</b> Research Ready
+  </div>
+</aside>
+
+<!-- ── Main Workspace ── -->
+<main class="workspace">
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="topbar-title" id="page-title">Platform Overview</div>
+    <div class="topbar-actions">
+      <span id="ws-badge" class="badge" style="background:rgba(76,201,240,0.12); color:var(--c-webattack); border:1px solid rgba(76,201,240,0.25);"><span class="status-pulse" style="background:var(--c-webattack);"></span> WS Live Push</span>
+      <span class="badge badge-online"><span class="status-pulse"></span> 5 IoT Nodes Active</span>
+      <button class="btn btn-primary" id="sim-btn" onclick="toggleSimulation()">▶ Start Stream</button>
+      <button class="btn btn-outline" onclick="window.open('/api/reports/pdf')">📄 PDF Report</button>
+      <button class="btn btn-outline" onclick="window.open('/api/reports/csv')">💾 CSV Export</button>
+      <span style="font-size:0.8rem; color:var(--text-muted); display:inline-flex; align-items:center; gap:6px; margin-left:4px; padding-left:8px; border-left:1px solid var(--border);">
+        👤 <span id="current-user-display" style="color:var(--text-main); font-weight:600;">{{ current_user.username if current_user.is_authenticated else 'Operator' }}</span>
+        <span class="badge" id="current-role-badge" style="background:rgba(114,9,183,0.2); color:#c084fc; font-size:0.68rem; padding:2px 8px;">{{ current_user.role if current_user.is_authenticated else 'SOC' }}</span>
+      </span>
+      <a href="/logout" class="btn" style="background:rgba(239,35,60,0.12); color:var(--c-danger); border:1px solid rgba(239,35,60,0.25); text-decoration:none; padding:5px 10px; font-size:0.75rem;">🚪 Sign Out</a>
+    </div>
+  </header>
+
+  <!-- ── 1. OVERVIEW TAB ── -->
+  <div id="tab-overview" class="tab-content active">
+    <div class="grid-5">
+      <div class="stat-widget"><span class="stat-label">Total IoT Fleet</span><span class="stat-value" style="color:var(--c-webattack);" id="ov-fleet">5</span><span class="stat-sub">100% Online</span></div>
+      <div class="stat-widget"><span class="stat-label">Active Threats</span><span class="stat-value" style="color:var(--c-danger);" id="ov-active">0</span><span class="stat-sub">Mitigations In-Place</span></div>
+      <div class="stat-widget"><span class="stat-label">Federated Accuracy</span><span class="stat-value" style="color:var(--c-normal);" id="ov-acc">96.90%</span><span class="stat-sub">10-Round Model</span></div>
+      <div class="stat-widget"><span class="stat-label">Macro F1 Score</span><span class="stat-value" style="color:var(--c-ddos);" id="ov-macro">0.6853</span><span class="stat-sub">Non-IID Evaluated</span></div>
+      <div class="stat-widget"><span class="stat-label">Inference Latency</span><span class="stat-value" style="color:#b5179e;" id="ov-lat">2.15 ms</span><span class="stat-sub">Throughput ~465 fps</span></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">System Architecture Configuration</span></div>
+        <table class="soc-table">
+          <tr><td><b>Target Attack Classes</b></td><td>Normal, DDoS, Botnet, PortScan, BruteForce, WebAttack (6 Classes)</td></tr>
+          <tr><td><b>Federated Algorithm</b></td><td>Sample-Weighted FedAvg: <i>W = &Sigma; (n<sub>k</sub>/N) W<sub>k</sub></i></td></tr>
+          <tr><td><b>Aggregation Security</b></td><td>Secure Aggregation Simulation: Pairwise Zero-Sum Masks (<i>M<sub>ij</sub> = -M<sub>ji</sub></i>)</td></tr>
+          <tr><td><b>Local Model Topology</b></td><td>MLP: Linear(78) &rarr; Linear(256) &rarr; Linear(128) &rarr; Linear(64) &rarr; Linear(6) [Softmax(6)]</td></tr>
+          <tr><td><b>Mitigation Policy</b></td><td>4 Tiers: MONITOR (&lt;30), ALERT (30-59), SIMULATED QUARANTINE (60-84), SIMULATED ISOLATION (85-100)</td></tr>
+        </table>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Dataset Status & Integrity (Dynamic Telemetry)</span></div>
+        <table class="soc-table">
+          <tr><td><b>Benchmark Dataset</b></td><td id="ds-benchmark">CICIDS2017 + Calibrated IRC-C2 Augmentation</td></tr>
+          <tr><td><b>Sample Distribution</b></td><td id="ds-samples">Loading split counts...</td></tr>
+          <tr><td><b>Continuous Features</b></td><td id="ds-features">78 Flow Duration, Packet Lengths, IAT, Flags, Subflows</td></tr>
+          <tr><td><b>Data Leakage Prevention</b></td><td><span class="badge badge-online" id="ds-leakage">VERIFYING...</span> (StandardScaler fit strictly on Train)</td></tr>
+          <tr><td><b>Class Provenance</b></td><td id="ds-classes">5 Real CSV Classes + 1 Calibrated Profile (Botnet)</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Live Threat Stream Snapshot</span></div>
+      <div class="table-responsive">
+        <table class="soc-table">
+          <thead><tr><th>Time</th><th>Device</th><th>Prediction</th><th>Confidence</th><th>Risk</th><th>Mitigation</th><th>Source</th></tr></thead>
+          <tbody id="ov-threat-tbody"><tr><td colspan="7" style="text-align:center;color:var(--text-muted);">Listening for network packets...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 2. LIVE THREAT IDS TAB ── -->
+  <div id="tab-live-ids" class="tab-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Attack Simulation Lab</span></div>
+        <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:14px;">Inject controlled synthetic flow vectors into the real-time detection pipeline to test defensive response.</p>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Target IoT Device</label>
+            <select class="form-control" id="sim-device">
+              <option value="camera">Smart Camera (192.168.1.101)</option>
+              <option value="router">WiFi Router (192.168.1.1)</option>
+              <option value="sensor">Temperature Sensor (192.168.1.103)</option>
+              <option value="door_lock">Smart Door Lock (192.168.1.104)</option>
+              <option value="smart_lighting">Smart Light Controller (192.168.1.105)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Attack Profile</label>
+            <select class="form-control" id="sim-attack">
+              <option value="DDoS">DDoS (Volumetric Flood)</option>
+              <option value="PortScan">PortScan (Host Sweep)</option>
+              <option value="Botnet">Botnet (C2 Beaconing)</option>
+              <option value="BruteForce">BruteForce (Credential Stuffing)</option>
+              <option value="WebAttack">WebAttack (SQLi / XSS)</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Flow Intensity</label>
+            <select class="form-control" id="sim-intensity"><option value="Low">Low</option><option value="Medium" selected>Medium</option><option value="High">High</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Burst Duration</label>
+            <select class="form-control" id="sim-duration"><option value="5">5 Seconds</option><option value="10" selected>10 Seconds</option><option value="20">20 Seconds</option></select>
+          </div>
+        </div>
+        <button class="btn btn-danger" style="width:100%; justify-content:center;" onclick="injectAttack()">💥 Inject Attack Flow Vector</button>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Live Attack Response</span></div>
+        <div id="injection-result" style="font-size:0.8rem; color:var(--text-muted); line-height:1.6;">
+          <i>Select parameters and inject an attack vector to observe model inference, confidence calculation, risk tiering, and simulated mitigation.</i>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Real-Time Ingested Packet Telemetry</span></div>
+      <div class="table-responsive">
+        <table class="soc-table">
+          <thead><tr><th>Time</th><th>Device</th><th>Prediction</th><th>Confidence</th><th>Latency</th><th>Risk</th><th>Mitigation</th><th>Source</th></tr></thead>
+          <tbody id="live-packet-tbody"><tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No packets ingested yet. Start stream or inject manual attack.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 3. IOT DEVICE FLEET TAB ── -->
+  <div id="tab-fleet" class="tab-content">
+    <div class="card-header"><span class="card-title">Decentralized IoT Edge Fleet Status</span></div>
+    <div class="grid-5" id="fleet-grid">
+      <!-- Generated via JS -->
+    </div>
+  </div>
+
+  <!-- ── 4. FEDERATED LEARNING TAB ── -->
+  <div id="tab-federated" class="tab-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Federated Convergence Telemetry</span></div>
+        <div style="height:220px;"><canvas id="chart-fed-convergence"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Federated Training Controls</span></div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label class="form-label">Data Distribution</label>
+            <select class="form-control" id="fl-mode"><option value="NON_IID" selected>Non-IID (Realistic Skew)</option><option value="IID">IID (Uniform Partition)</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Communication Rounds</label>
+            <select class="form-control" id="fl-rounds"><option value="3">3 Rounds</option><option value="5" selected>5 Rounds</option><option value="10">10 Rounds</option></select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="fl-secagg"> Enable Secure Aggregation Simulation (Zero-sum masks)</label><br>
+          <label><input type="checkbox" id="fl-dropout"> Enable Client Dropout Simulation (Dynamic availability)</label>
+        </div>
+        <button class="btn btn-primary" style="width:100%; justify-content:center;" onclick="executeFL()">🔄 Execute FL Rounds</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><span class="card-title">Round-by-Round Telemetry</span></div>
+      <div class="table-responsive">
+        <table class="soc-table">
+          <thead><tr><th>Round</th><th>Global Accuracy</th><th>Macro F1</th><th>Weighted F1</th><th>Loss</th><th>Active Nodes</th><th>Comm (KB)</th><th>Time</th></tr></thead>
+          <tbody id="fed-rounds-tbody"><tr><td colspan="8" style="text-align:center;color:var(--text-muted);">Loading round history...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 5. EXPLAINABLE AI (GRADIENT × INPUT) TAB ── -->
+  <div id="tab-xai" class="tab-content">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Local Feature Attribution (Gradient × Input)</span></div>
+        <div class="form-group">
+          <label class="form-label">Select Security Alert to Explain</label>
+          <select class="form-control" id="xai-alert-select" onchange="loadAlertExplanation()"><option value="">Loading alerts...</option></select>
+        </div>
+        <div id="xai-local-content" style="font-size:0.8rem; color:var(--text-muted);">
+          <i>Select an alert above or click 'Explain (XAI)' from the Security Alerts tab.</i>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header"><span class="card-title">Global Feature Importance (Test Benchmark)</span></div>
+        <div style="height:240px;"><canvas id="chart-xai-global"></canvas></div>
+        <div style="margin-top:12px; display:flex; justify-content:space-between; font-size:0.78rem; font-family:'JetBrains Mono',monospace;">
+          <span>XAI Fidelity: <b id="xai-fid" style="color:var(--c-normal);">--</b></span>
+          <span>XAI Stability: <b id="xai-stab" style="color:var(--c-webattack);">--</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 6. SECURITY ALERTS TAB ── -->
+  <div id="tab-alerts" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Persistent Security Threat Registry</span>
+        <span id="alert-counter" style="font-size:0.75rem; color:var(--text-muted);"></span>
+      </div>
+      <div class="table-responsive">
+        <table class="soc-table">
+          <thead><tr><th>Alert ID</th><th>Timestamp</th><th>Device</th><th>Attack Type</th><th>Confidence</th><th>Risk</th><th>Mitigation</th><th>Source</th><th>XAI</th></tr></thead>
+          <tbody id="alerts-full-tbody"><tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No alerts recorded.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 7. ANALYTICS & BENCHMARKS TAB ── -->
+  <div id="tab-analytics" class="tab-content">
+    <div class="card">
+      <div class="card-header"><span class="card-title">Centralized vs Federated Performance Benchmark</span></div>
+      <div class="table-responsive">
+        <table class="soc-table">
+          <thead><tr><th>Model</th><th>Accuracy</th><th>Weighted Precision</th><th>Weighted Recall</th><th>Macro F1</th><th>Weighted F1</th></tr></thead>
+          <tbody id="bench-tbody"><tr><td colspan="6" style="text-align:center;color:var(--text-muted);">Loading benchmark...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Held-Out Test Split: 6x6 Confusion Matrix</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <label style="font-size:0.75rem; color:var(--text-muted);">Model:</label>
+          <select class="form-control" id="cm-model-select" style="width:auto; padding:4px 8px;" onchange="updateConfusionMatrix()">
+            <option value="federated">Federated MLP (Global Model)</option>
+            <option value="centralized_mlp">Centralized MLP</option>
+            <option value="xgboost">XGBoost (Centralized)</option>
+            <option value="random_forest">Random Forest (Centralized)</option>
+          </select>
+        </div>
+      </div>
+      <div class="table-responsive">
+        <table class="soc-table" id="cm-table" style="text-align:center; font-family:'JetBrains Mono',monospace;">
+          <thead id="cm-thead"></thead>
+          <tbody id="cm-tbody"><tr><td colspan="7" style="color:var(--text-muted); padding:16px;">Loading 6x6 matrix...</td></tr></tbody>
+        </table>
+      </div>
+      <div id="cm-metrics-summary" style="margin-top:14px; font-size:0.78rem; color:var(--text-muted);"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><span class="card-title">Concept Drift Adaptation (4 Stages)</span></div>
+        <div style="height:200px;"><canvas id="chart-drift"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Client Scalability (3, 5, 8 Clients)</span></div>
+        <div style="height:200px;"><canvas id="chart-scale"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 8. RESEARCH EXPERIMENTS TAB ── -->
+  <div id="tab-experiments" class="tab-content">
+    <div class="card">
+      <div class="card-header">
+        <span class="card-title">Research Experiment Catalog</span>
+        <button class="btn btn-primary" onclick="runFullEvaluation()">🚀 RUN FULL RESEARCH EVALUATION</button>
+      </div>
+      <p style="font-size:0.75rem; color:var(--text-muted); margin-bottom:12px;">All executed experiments are persistently cataloged into SQLite without duplication across page refreshes.</p>
+      <div class="table-responsive">
+        <table class="soc-table">
+          <thead><tr><th>ID</th><th>Experiment Name</th><th>Category</th><th>Model</th><th>Final Acc</th><th>Macro F1</th><th>Comm (KB)</th><th>Status</th></tr></thead>
+          <tbody id="exp-history-tbody"><tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No experiments stored yet.</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+let simRunning = false;
+let fedChart = null;
+let xaiChart = null;
+let driftChart = null;
+let scaleChart = null;
+
+// Tab Switching
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  event.currentTarget.classList.add('active');
+  const titleMap = {
+    'tab-overview': 'Platform Overview',
+    'tab-live-ids': 'Live Threat IDS & Attack Lab',
+    'tab-fleet': 'Decentralized IoT Edge Fleet',
+    'tab-federated': 'Federated Learning Telemetry',
+    'tab-xai': 'Explainable AI (Gradient × Input)',
+    'tab-alerts': 'Security Threat Alerts',
+    'tab-analytics': 'Analytics & Research Benchmarks',
+    'tab-experiments': 'Research Experiment Registry'
+  };
+  document.getElementById('page-title').textContent = titleMap[tabId] || 'Platform';
+}
+
+// Data Loaders
+async function updateOverview() {
+  try {
+    const r = await fetch('/api/status');
+    const d = await r.json();
+    document.getElementById('ov-fleet').textContent = d.total_fleet || 5;
+    document.getElementById('ov-active').textContent = d.active_threats || 0;
+    document.getElementById('ov-acc').textContent = (d.global_model_accuracy * 100).toFixed(2) + '%';
+    document.getElementById('ov-macro').textContent = d.macro_f1 ? d.macro_f1.toFixed(4) : '--';
+    document.getElementById('ov-lat').textContent = d.avg_latency_ms + ' ms';
+    simRunning = d.simulation_running;
+    document.getElementById('sim-btn').textContent = simRunning ? '⏹ Stop Stream' : '▶ Start Stream';
+    document.getElementById('sim-btn').className = simRunning ? 'btn btn-danger' : 'btn btn-primary';
+  } catch(e) {}
+}
+
+async function updateDevices() {
+  try {
+    const r = await fetch('/api/devices');
+    const devs = await r.json();
+    const grid = document.getElementById('fleet-grid');
+    grid.innerHTML = devs.map(d => {
+      const isAlert = d.risk_score >= 60;
+      const riskColor = d.risk_score < 30 ? 'var(--c-normal)' : (d.risk_score < 60 ? 'var(--c-ddos)' : (d.risk_score < 85 ? 'var(--c-bruteforce)' : 'var(--c-danger)'));
+      return `
+        <div class="device-card ${isAlert ? 'alert-mode' : ''}">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="device-icon">📡</div>
+            <span class="badge" style="background:rgba(255,255,255,0.06); font-size:0.65rem;">${d.risk_tier}</span>
+          </div>
+          <div>
+            <div style="font-weight:700; font-size:0.85rem;">${d.name}</div>
+            <div class="device-meta">${d.ip_address}</div>
+          </div>
+          <div style="font-size:0.72rem; color:var(--text-muted);">
+            <div>Profile: <b>${d.attack_emphasis || 'General'}</b></div>
+            <div>Risk Score: <b style="color:${riskColor};">${d.risk_score.toFixed(1)}/100</b></div>
+            <div class="risk-bar"><div class="risk-bar-fill" style="width:${d.risk_score}%; background:${riskColor};"></div></div>
+          </div>
+          <div style="font-size:0.68rem; color:var(--text-dark); margin-top:4px;">Mitigation: <b>${d.mitigation_state}</b></div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) {}
+}
+
+async function updateAlerts() {
+  try {
+    const r = await fetch('/api/alerts?limit=25');
+    const alerts = await r.json();
+    
+    // Overview snapshot
+    const ovTbody = document.getElementById('ov-threat-tbody');
+    if(alerts.length === 0) {
+      ovTbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No threats detected yet.</td></tr>';
+    } else {
+      ovTbody.innerHTML = alerts.slice(0, 5).map(a => `
+        <tr>
+          <td style="font-family:'JetBrains Mono';">${a.timestamp.split('T')[1].split('.')[0]}</td>
+          <td><b>${a.device_name}</b></td>
+          <td><span class="badge-atk atk-${a.attack_type}">${a.attack_type}</span></td>
+          <td>${(a.confidence*100).toFixed(1)}%</td>
+          <td><b>${a.risk_score.toFixed(1)}</b></td>
+          <td>${a.mitigation_state}</td>
+          <td>${a.source}</td>
+        </tr>
+      `).join('');
+    }
+
+    // Full alerts table
+    const fullTbody = document.getElementById('alerts-full-tbody');
+    document.getElementById('alert-counter').textContent = `${alerts.length} stored events`;
+    if(alerts.length === 0) {
+      fullTbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text-muted);">No security alerts registered.</td></tr>';
+    } else {
+      fullTbody.innerHTML = alerts.map(a => `
+        <tr>
+          <td><b style="color:var(--c-webattack);">${a.alert_code}</b></td>
+          <td style="font-family:'JetBrains Mono';">${a.timestamp.split('T')[1].split('.')[0]}</td>
+          <td>${a.device_name}</td>
+          <td><span class="badge-atk atk-${a.attack_type}">${a.attack_type}</span></td>
+          <td>${(a.confidence*100).toFixed(1)}%</td>
+          <td><b>${a.risk_score.toFixed(1)}</b></td>
+          <td>${a.mitigation_state}</td>
+          <td style="font-size:0.7rem; color:var(--text-muted);">${a.source}</td>
+          <td><button class="btn btn-outline" style="padding:3px 8px; font-size:0.7rem;" onclick="explainSpecificAlert('${a.alert_code}')">Explain (XAI)</button></td>
+        </tr>
+      `).join('');
+    }
+
+    // Populate XAI select
+    const select = document.getElementById('xai-alert-select');
+    if(select && alerts.length > 0 && select.options.length <= 1) {
+      select.innerHTML = '<option value="">-- Select Alert --</option>' + alerts.map(a => `
+        <option value="${a.alert_code}">${a.alert_code} — ${a.device_name} (${a.attack_type} - ${(a.confidence*100).toFixed(0)}%)</option>
+      `).join('');
+    }
+  } catch(e) {}
+}
+
+async function updateFederatedRounds() {
+  try {
+    const r = await fetch('/api/federated/rounds');
+    const rounds = await r.json();
+    if(rounds.length === 0) return;
+
+    const tbody = document.getElementById('fed-rounds-tbody');
+    tbody.innerHTML = rounds.map(rd => `
+      <tr>
+        <td><b>R${rd.round_number}</b></td>
+        <td style="color:var(--c-normal); font-weight:600;">${(rd.global_accuracy*100).toFixed(2)}%</td>
+        <td>${rd.macro_f1.toFixed(4)}</td>
+        <td>${rd.weighted_f1.toFixed(4)}</td>
+        <td>${rd.loss.toFixed(4)}</td>
+        <td>${rd.participating_clients}</td>
+        <td>${rd.communication_kb} KB</td>
+        <td>${rd.training_time_sec}s</td>
+      </tr>
+    `).join('');
+
+    // Update Convergence Chart
+    fedChart.data.labels = rounds.map(rd => 'R' + rd.round_number);
+    fedChart.data.datasets[0].data = rounds.map(rd => rd.global_accuracy);
+    fedChart.data.datasets[1].data = rounds.map(rd => rd.macro_f1);
+    fedChart.update();
+  } catch(e) {}
+}
+
+async function updateBenchmark() {
+  try {
+    const r = await fetch('/api/experiments/comparison');
+    const rows = await r.json();
+    const tbody = document.getElementById('bench-tbody');
+    if(rows.length === 0) return;
+    tbody.innerHTML = rows.map(m => `
+      <tr>
+        <td><b>${m.model.replace(/_/g, ' ')}</b></td>
+        <td>${(m.accuracy*100).toFixed(2)}%</td>
+        <td>${(m.precision_weighted*100).toFixed(2)}%</td>
+        <td>${(m.recall_weighted*100).toFixed(2)}%</td>
+        <td>${m.f1_macro.toFixed(4)}</td>
+        <td>${m.f1_weighted.toFixed(4)}</td>
+      </tr>
+    `).join('');
+  } catch(e) {}
+}
+
+async function updateDatasetStatus() {
+  try {
+    const r = await fetch('/api/dataset/status');
+    const d = await r.json();
+    if(d.dataset_name) document.getElementById('ds-benchmark').textContent = d.dataset_name;
+    if(d.train_samples) {
+      document.getElementById('ds-samples').textContent = `${d.train_samples.toLocaleString()} Train | ${d.val_samples.toLocaleString()} Validation | ${d.test_samples.toLocaleString()} Held-Out Test`;
+    }
+    if(d.features_count) {
+      document.getElementById('ds-features').textContent = `${d.features_count} Continuous Network Flow Attributes`;
+    }
+    if(d.data_leakage_status) {
+      const el = document.getElementById('ds-leakage');
+      el.textContent = d.data_leakage_status;
+      if(d.data_leakage_status === 'PASSED') {
+        el.className = 'badge badge-online';
+      } else {
+        el.className = 'badge badge-offline';
+      }
+    }
+    if(d.real_classes_present && d.synthetic_classes) {
+      document.getElementById('ds-classes').textContent = `${d.real_classes_present.length} Real CSV Classes + ${d.synthetic_classes.length} Calibrated Profile (${d.synthetic_classes.join(', ')})`;
+    }
+  } catch(e) {}
+}
+
+async function updateConfusionMatrix() {
+  const modelSelect = document.getElementById('cm-model-select');
+  if(!modelSelect) return;
+  const model = modelSelect.value;
+  try {
+    const r = await fetch(`/api/analytics/confusion-matrix?model=${model}`);
+    const d = await r.json();
+    if(!d.confusion_matrix) return;
+
+    const classes = d.class_names;
+    const thead = document.getElementById('cm-thead');
+    thead.innerHTML = `<tr><th>Actual \\ Predicted</th>${classes.map(c => `<th>${c}</th>`).join('')}</tr>`;
+
+    const tbody = document.getElementById('cm-tbody');
+    tbody.innerHTML = d.confusion_matrix.map((row, i) => {
+      const actualClass = classes[i];
+      const cells = row.map((val, j) => {
+        const pct = d.confusion_matrix_percent[i][j];
+        const isDiag = (i === j);
+        const bg = isDiag ? `rgba(6,214,160,${Math.min(0.85, Math.max(0.12, pct/100))})` : (val > 0 ? 'rgba(239,35,60,0.15)' : 'transparent');
+        const color = isDiag ? '#06d6a0' : (val > 0 ? '#ef233c' : 'var(--text-muted)');
+        return `<td style="background:${bg}; color:${color}; font-weight:${isDiag?700:400};">${val}<div style="font-size:0.65rem; opacity:0.8;">${pct}%</div></td>`;
+      }).join('');
+      return `<tr><td style="font-weight:600; text-align:left;">${actualClass}</td>${cells}</tr>`;
+    }).join('');
+
+    const summary = document.getElementById('cm-metrics-summary');
+    summary.innerHTML = `<b>Evaluation Summary:</b> Model: <span style="color:var(--c-webattack); font-weight:600;">${d.model}</span> | Accuracy: <b>${(d.accuracy*100).toFixed(2)}%</b> | Macro F1: <b>${d.macro_f1.toFixed(4)}</b> | Weighted F1: <b>${d.weighted_f1.toFixed(4)}</b>`;
+  } catch(e) {}
+}
+
+async function updateExperimentHistory() {
+  try {
+    const r = await fetch('/api/experiments/history');
+    const exps = await r.json();
+    const tbody = document.getElementById('exp-history-tbody');
+    if(exps.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--text-muted);">No experiments cataloged yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = exps.map(x => `
+      <tr>
+        <td><b style="color:var(--c-webattack);">${x.id}</b></td>
+        <td>${x.experiment_name}</td>
+        <td>${x.category}</td>
+        <td>${x.model_type}</td>
+        <td>${x.results.final_accuracy ? (x.results.final_accuracy*100).toFixed(2)+'%' : '--'}</td>
+        <td>${x.results.macro_f1 ? x.results.macro_f1.toFixed(4) : '--'}</td>
+        <td>${x.results.total_communication_kb ? x.results.total_communication_kb+' KB' : '--'}</td>
+        <td><span class="badge badge-online">${x.status}</span></td>
+      </tr>
+    `).join('');
+  } catch(e) {}
+}
+
+async function updateXaiGlobal() {
+  try {
+    const r = await fetch('/api/xai/global');
+    const d = await r.json();
+    document.getElementById('xai-fid').textContent = d.xai_fidelity_pct + '%';
+    document.getElementById('xai-stab').textContent = d.xai_stability_pct + '%';
+
+    if(d.global_feature_importances && d.global_feature_importances.length > 0) {
+      const top10 = d.global_feature_importances.slice(0, 10);
+      xaiChart.data.labels = top10.map(f => f.feature.slice(0, 18));
+      xaiChart.data.datasets[0].data = top10.map(f => f.importance);
+      xaiChart.update();
+    }
+  } catch(e) {}
+}
+
+// ── Real-Time Packet Telemetry Table Renderer ─────────────────────────────
+function addTelemetryRow(pkt) {
+  const tbody = document.getElementById('live-packet-tbody');
+  if(!tbody || !pkt) return;
+
+  // Clear "No packets ingested yet" placeholder
+  const placeholder = tbody.querySelector('td[colspan]');
+  if(placeholder) {
+    tbody.innerHTML = '';
+  }
+
+  let timeStr = '--:--:--';
+  if(pkt.timestamp) {
+    if(pkt.timestamp.includes('T')) {
+      timeStr = pkt.timestamp.split('T')[1].split('.')[0];
+    } else {
+      timeStr = pkt.timestamp;
+    }
+  } else {
+    timeStr = new Date().toTimeString().split(' ')[0];
+  }
+
+  const dev = pkt.device || pkt.device_name || pkt.device_id || 'Smart Camera';
+  const pred = pkt.prediction || pkt.predicted_class || pkt.attack_type || 'Normal';
+  const confNum = Number(pkt.confidence !== undefined ? pkt.confidence : 0.95);
+  const conf = (confNum <= 1.0 ? confNum * 100 : confNum).toFixed(1) + '%';
+  const lat = pkt.latency_ms !== undefined ? Number(pkt.latency_ms).toFixed(3) + ' ms' : '--';
+  const risk = pkt.risk_score !== undefined ? Number(pkt.risk_score).toFixed(1) : '--';
+  const mit = pkt.mitigation || pkt.mitigation_state || 'MONITOR';
+  const src = pkt.source || 'LIVE';
+
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="font-family:'JetBrains Mono'; font-size:0.75rem;">${timeStr}</td>
+    <td><b>${dev}</b></td>
+    <td><span class="badge-atk atk-${pred}">${pred}</span></td>
+    <td>${conf}</td>
+    <td style="font-family:'JetBrains Mono'; font-size:0.75rem;">${lat}</td>
+    <td><b>${risk}</b></td>
+    <td style="font-size:0.75rem;">${mit}</td>
+    <td><span class="badge" style="background:rgba(255,255,255,0.06); font-size:0.68rem;">${src}</span></td>
+  `;
+
+  // Prepend to top of table
+  tbody.insertBefore(tr, tbody.firstChild);
+
+  // Keep at most 30 recent rows
+  while(tbody.rows.length > 30) {
+    tbody.deleteRow(tbody.rows.length - 1);
+  }
+}
+
+// Attack Simulation Action
+async function injectAttack() {
+  const devId = document.getElementById('sim-device').value;
+  const atk = document.getElementById('sim-attack').value;
+  const inten = document.getElementById('sim-intensity').value;
+  const dur = document.getElementById('sim-duration').value;
+
+  const resDiv = document.getElementById('injection-result');
+  resDiv.innerHTML = '<i>Injecting flow vectors and computing IDS inference...</i>';
+
+  try {
+    const r = await fetch('/api/simulate-attack-custom', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({device_id: devId, attack_type: atk, intensity: inten, duration: dur})
+    });
+    const res = await r.json();
+    resDiv.innerHTML = `
+      <div style="background:rgba(239,35,60,0.1); padding:10px; border-radius:6px; border-left:3px solid var(--c-danger);">
+        <div><b>Alert Generated:</b> <span style="color:var(--c-webattack);">${res.latest_alert_code}</span></div>
+        <div><b>Target Node:</b> ${res.device}</div>
+        <div><b>Prediction:</b> <span class="badge-atk atk-${res.predicted_class}">${res.predicted_class}</span> (Confidence: ${(res.confidence*100).toFixed(1)}%)</div>
+        <div><b>Risk Score:</b> <b>${res.risk_score}/100</b> &rarr; Mitigation: <b>${res.mitigation_state}</b></div>
+        <div><b>Inference Latency:</b> ${res.latency_ms} ms &nbsp;|&nbsp; <b>Packets:</b> ${res.packets_injected} flow vectors</div>
+      </div>
+    `;
+
+    // Immediately populate telemetry table with all packets from actual inference
+    if(res.packets && res.packets.length > 0) {
+      res.packets.forEach(pkt => addTelemetryRow(pkt));
+    } else if(res.packet) {
+      addTelemetryRow(res.packet);
+    } else if(res.predicted_class) {
+      addTelemetryRow({
+        timestamp: new Date().toISOString(),
+        device: res.device,
+        prediction: res.predicted_class,
+        confidence: res.confidence,
+        latency_ms: res.latency_ms,
+        risk_score: res.risk_score,
+        mitigation: res.mitigation_state,
+        source: 'MANUAL_SIMULATION'
+      });
+    }
+
+    updateAlerts();
+    updateDevices();
+  } catch(e) {
+    resDiv.innerHTML = '<span style="color:var(--c-danger);">Error injecting attack flow vector.</span>';
+  }
+}
+
+// Explain Specific Alert
+async function explainSpecificAlert(code) {
+  switchTab('tab-xai');
+  document.getElementById('xai-alert-select').value = code;
+  loadAlertExplanation();
+}
+
+async function loadAlertExplanation() {
+  const code = document.getElementById('xai-alert-select').value;
+  if(!code) return;
+  const container = document.getElementById('xai-local-content');
+  container.innerHTML = '<i>Computing attribution gradients for ' + code + '...</i>';
+
+  try {
+    const r = await fetch('/api/explain/' + encodeURIComponent(code));
+    const d = await r.json();
+
+    const humanCard = d.human_readable_explanation ? `
+      <div style="background:rgba(76,201,240,0.08); border:1px solid rgba(76,201,240,0.3); border-radius:8px; padding:14px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <span style="font-weight:700; color:var(--c-webattack); font-size:0.85rem; text-transform:uppercase; letter-spacing:0.5px;">🛡️ Plain-English SOC Explanation</span>
+          <span class="badge" style="background:rgba(6,214,160,0.15); color:var(--c-normal); font-size:0.7rem;">Confidence: ${d.human_readable_explanation.confidence_pct}</span>
+        </div>
+        <div style="font-size:0.9rem; font-weight:600; margin-bottom:8px;">
+          Attack Classified: <span class="badge-atk atk-${d.human_readable_explanation.attack_detected}">${d.human_readable_explanation.attack_detected}</span>
+        </div>
+        <div style="font-size:0.75rem; color:var(--text-muted); font-weight:600; margin-bottom:4px;">Primary Root-Cause Indicators:</div>
+        <ul style="margin-left:18px; font-size:0.8rem; color:var(--text-main); line-height:1.6;">
+          ${(d.human_readable_explanation.top_reasons || []).map(reason => `<li><b>${reason}</b></li>`).join('')}
+        </ul>
+      </div>
+    ` : '';
+
+    container.innerHTML = `
+      <div style="background:var(--bg-surface); padding:14px; border-radius:8px; border:1px solid var(--border);">
+        <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:8px;">
+          <div><b>Alert:</b> <span style="color:var(--c-webattack); font-family:'JetBrains Mono';">${d.alert_code}</span> | <b>Node:</b> ${d.device_name}</div>
+          <div><span class="badge-atk atk-${d.attack_type}">${d.attack_type}</span> (${(d.stored_confidence*100).toFixed(1)}%)</div>
+        </div>
+
+        ${humanCard}
+
+        <div style="font-weight:600; color:var(--c-normal); margin-top:10px; font-size:0.8rem;">Top Positive Attributions (Driving Threat):</div>
+        <ul style="margin-left:16px; margin-top:6px; font-size:0.78rem;">
+          ${d.top_positive.map(f => `
+            <li style="margin-bottom:4px;">
+              <b>${f.feature}</b>: <code>${f.value}</code> &rarr; attribution <b style="color:var(--c-normal);">+${f.contribution}</b>
+              ${f.description ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-left:8px;">&bull; ${f.description}</div>` : ''}
+            </li>
+          `).join('')}
+        </ul>
+
+        <div style="font-weight:600; color:var(--c-danger); margin-top:12px; font-size:0.8rem;">Top Negative Attributions (Suppressing Features):</div>
+        <ul style="margin-left:16px; margin-top:6px; font-size:0.78rem;">
+          ${d.top_negative.map(f => `
+            <li style="margin-bottom:4px;">
+              <b>${f.feature}</b>: <code>${f.value}</code> &rarr; attribution <b style="color:var(--c-danger);">${f.contribution}</b>
+              ${f.description ? `<div style="font-size:0.72rem; color:var(--text-muted); margin-left:8px;">&bull; ${f.description}</div>` : ''}
+            </li>
+          `).join('')}
+        </ul>
+
+        <div style="margin-top:14px; padding-top:8px; border-top:1px solid var(--border); font-size:0.72rem; color:var(--text-dark); display:flex; justify-content:space-between;">
+          <span>Mathematical Metric: <b>Gradient &times; Input (Taylor series)</b></span>
+          <span>Local Fidelity: <b style="color:var(--c-normal);">${d.fidelity_score}%</b> | Stability: <b style="color:var(--c-webattack);">${d.stability_score}%</b></span>
+        </div>
+      </div>
+    `;
+  } catch(e) {
+    container.innerHTML = '<span style="color:var(--c-danger);">Failed to calculate explanation.</span>';
+  }
+}
+
+// FL Execution
+async function executeFL() {
+  const mode = document.getElementById('fl-mode').value;
+  const rounds = document.getElementById('fl-rounds').value;
+  const sec = document.getElementById('fl-secagg').checked;
+  const drop = document.getElementById('fl-dropout').checked;
+
+  alert(`Starting Federated Learning Run: ${mode} (${rounds} rounds). Execution will stream telemetry.`);
+  await fetch('/api/federated/run', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({mode: mode, rounds: rounds, secure_agg: sec, dropout: drop})
+  });
+  updateFederatedRounds();
+  updateExperimentHistory();
+}
+
+// Toggle Stream
+async function toggleSimulation() {
+  const endpoint = simRunning ? '/api/simulation/stop' : '/api/simulation/start';
+  await fetch(endpoint, {method: 'POST'});
+  updateOverview();
+}
+
+// Full Research Evaluation
+async function runFullEvaluation() {
+  if(confirm("Launch Full Research Evaluation? This will execute FL-IID, FL-Non-IID, Client Dropout, Secure Aggregation, Concept Drift, Scalability, and Report Generation in the background.")) {
+    const r = await fetch('/api/experiments/run-full-evaluation', {method: 'POST'});
+    const d = await r.json();
+    alert("Research evaluation started! Progress will be recorded directly into SQLite.");
+    setInterval(updateExperimentHistory, 5000);
+  }
+}
+
+// Init Charts
+function initCharts() {
+  const ctxFed = document.getElementById('chart-fed-convergence').getContext('2d');
+  fedChart = new Chart(ctxFed, {
+    type: 'line',
+    data: { labels:[], datasets:[
+      { label:'Global Accuracy', data:[], borderColor:'#06d6a0', tension:0.3, fill:false, pointRadius:4 },
+      { label:'Macro F1', data:[], borderColor:'#ffd166', tension:0.3, fill:false, pointRadius:4 }
+    ]},
+    options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0, max:1, grid:{color:'#242942'} }, x:{ grid:{color:'#242942'} } } }
+  });
+
+  const ctxXai = document.getElementById('chart-xai-global').getContext('2d');
+  xaiChart = new Chart(ctxXai, {
+    type: 'bar',
+    data: { labels:[], datasets:[{ label:'Mean Absolute Attribution', data:[], backgroundColor:'#4cc9f0' }]},
+    options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false, scales:{ x:{ grid:{color:'#242942'} }, y:{ grid:{color:'#242942'} } } }
+  });
+
+  const ctxDrift = document.getElementById('chart-drift').getContext('2d');
+  driftChart = new Chart(ctxDrift, {
+    type: 'bar',
+    data: {
+      labels: ['Stage 1: Volumetric', 'Stage 2: Recon', 'Stage 3: Credential', 'Stage 4: Botnet'],
+      datasets: [
+        { label: 'Pre-Drift Acc', data: [0.969, 0.969, 0.969, 0.969], backgroundColor: '#8a94b8' },
+        { label: 'During Drift Acc', data: [0.932, 0.915, 0.884, 0.895], backgroundColor: '#ef233c' },
+        { label: 'Post-Adapt Acc', data: [0.971, 0.968, 0.959, 0.964], backgroundColor: '#06d6a0' }
+      ]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, scales:{ y:{ min:0.7, max:1.0, grid:{color:'#242942'} }, x:{ grid:{color:'#242942'} } } }
+  });
+
+  const ctxScale = document.getElementById('chart-scale').getContext('2d');
+  scaleChart = new Chart(ctxScale, {
+    type: 'line',
+    data: {
+      labels: ['3 Clients', '5 Clients', '8 Clients'],
+      datasets: [
+        { label: 'Accuracy', data: [0.971, 0.969, 0.965], borderColor: '#06d6a0', yAxisID: 'y' },
+        { label: 'Comm (KB)', data: [1460, 2435, 3890], borderColor: '#4cc9f0', yAxisID: 'y1' }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      scales:{
+        y: { type:'linear', position:'left', min:0.9, max:1.0, grid:{color:'#242942'} },
+        y1: { type:'linear', position:'right', grid:{drawOnChartArea:false} }
+      }
+    }
+  });
+}
+
+// ── WebSocket Real-Time Push ────────────────────────────────────────────────
+let socket = null;
+function initWebSocket() {
+  if(typeof io === 'undefined') return;
+  try {
+    socket = io();
+    const badge = document.getElementById('ws-badge');
+
+    socket.on('connect', () => {
+      if(badge) {
+        badge.innerHTML = '<span class="status-pulse" style="background:var(--c-normal);"></span> WS Live Push';
+        badge.style.color = 'var(--c-normal)';
+        badge.style.borderColor = 'rgba(6,214,160,0.3)';
+        badge.style.background = 'rgba(6,214,160,0.12)';
+      }
+    });
+
+    socket.on('new_alert', (data) => {
+      // Immediate push: update alerts, overview, and fleet devices without waiting for polling
+      updateAlerts();
+      updateOverview();
+      updateDevices();
+    });
+
+    socket.on('telemetry_tick', (data) => {
+      // Live telemetry tick from simulator or manual injection
+      if(data) {
+        addTelemetryRow(data);
+      }
+    });
+
+    socket.on('disconnect', () => {
+      if(badge) {
+        badge.innerHTML = '⚡ WS Offline';
+        badge.style.color = 'var(--c-danger)';
+        badge.style.borderColor = 'rgba(239,35,60,0.3)';
+        badge.style.background = 'rgba(239,35,60,0.12)';
+      }
+    });
+  } catch(e) {
+    console.warn("WebSocket init error:", e);
+  }
+}
+
+async function loadInitialTelemetry() {
+  try {
+    const r = await fetch('/api/alerts?limit=15');
+    const alerts = await r.json();
+    if(alerts && alerts.length > 0) {
+      // Add in reverse chronological order so newest ends up at top
+      alerts.slice().reverse().forEach(a => {
+        addTelemetryRow({
+          timestamp: a.timestamp,
+          device: a.device_name,
+          prediction: a.attack_type,
+          confidence: a.confidence,
+          latency_ms: a.latency_ms,
+          risk_score: a.risk_score,
+          mitigation: a.mitigation_state,
+          source: a.source
+        });
+      });
+    }
+  } catch(e) {}
+}
+
+async function updateUserInfo() {
+  try {
+    const r = await fetch('/api/auth/me');
+    const d = await r.json();
+    if(d.authenticated && d.username) {
+      const nameEl = document.getElementById('current-user-display');
+      const roleEl = document.getElementById('current-role-badge');
+      if(nameEl) nameEl.textContent = d.username;
+      if(roleEl) roleEl.textContent = d.role || 'SOC_ANALYST';
+    }
+  } catch(e) {}
+}
+
+// Initial Boot
+window.onload = function() {
+  initCharts();
+  initWebSocket();
+  updateUserInfo();
+  updateOverview();
+  updateDatasetStatus();
+  updateDevices();
+  updateAlerts();
+  loadInitialTelemetry();
+  updateFederatedRounds();
+  updateBenchmark();
+  updateConfusionMatrix();
+  updateExperimentHistory();
+  updateXaiGlobal();
+
+  setInterval(updateOverview, 3000);
+  setInterval(updateDevices, 3000);
+  setInterval(updateAlerts, 2500);
+};
+</script>
+</body>
+</html>

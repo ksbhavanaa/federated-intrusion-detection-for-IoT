@@ -1,0 +1,6 @@
+Client,Mode,Total_Samples,Num_Classes,Train_Samples,Val_Samples,Test_Samples,Count_Normal,Pct_Normal,Count_DDoS,Pct_DDoS,Count_PortScan,Pct_PortScan,Count_Botnet,Pct_Botnet,Count_WebAttack,Pct_WebAttack,Count_BruteForce,Pct_BruteForce
+camera,NON_IID,13176,6,9223,1317,2636,8195,62.2,4795,36.39,96,0.73,60,0.46,15,0.11,15,0.11
+router,NON_IID,9978,6,6984,997,1997,8195,82.13,342,3.43,1351,13.54,60,0.6,15,0.15,15,0.15
+sensor,NON_IID,10758,6,7530,1075,2153,8195,76.18,342,3.18,1351,12.56,840,7.81,15,0.14,15,0.14
+door_lock,NON_IID,8843,6,6190,884,1769,8195,92.67,342,3.87,96,1.09,60,0.68,15,0.17,135,1.53
+smart_lighting,NON_IID,8764,6,6134,876,1754,8195,93.51,342,3.9,96,1.1,60,0.68,56,0.64,15,0.17

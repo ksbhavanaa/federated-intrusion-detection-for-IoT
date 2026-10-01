@@ -1,0 +1,2 @@
+Algorithm,Accuracy,Precision,Recall,F1 Score
+XGBoost,0.99725,0.9974662134122725,0.99725,0.9972913163354556

@@ -1,0 +1,14 @@
+Model: Federated_Neural_Network
+
+              precision    recall  f1-score   support
+
+      Botnet       1.00      1.00      1.00       240
+  BruteForce       0.97      0.79      0.87        39
+        DDoS       0.98      0.96      0.97      1370
+      Normal       0.97      0.99      0.98      8196
+    PortScan       0.99      0.51      0.67       386
+   WebAttack       0.38      0.94      0.55        16
+
+    accuracy                           0.97     10247
+   macro avg       0.88      0.87      0.84     10247
+weighted avg       0.97      0.97      0.97     10247

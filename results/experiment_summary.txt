@@ -1,0 +1,33 @@
+Federated IDS — Experiment Summary
+Generated: 2026-09-09T21:11:40.484548
+============================================================
+
+DATASET
+  Source: CICIDS2017 + IoT device simulation
+  Classes: Normal, DDoS, PortScan, BruteForce, WebAttack (5)
+
+CLIENT DISTRIBUTION
+        Client  Total_Samples  Num_Classes
+        camera          13176            6
+        router           9978            6
+        sensor          10758            6
+     door_lock           8843            6
+smart_lighting           8764            6
+
+MODEL COMPARISON
+                     model  accuracy  precision_macro  recall_macro  f1_macro  precision_weighted  recall_weighted  f1_weighted
+             Random_Forest    0.9980           0.9977        0.9791    0.9881              0.9981           0.9980       0.9980
+                   XGBoost    0.9990           0.9978        0.9807    0.9889              0.9990           0.9990       0.9990
+Centralized_Neural_Network    0.9891           0.8223        0.7875    0.8029              0.9875           0.9891       0.9882
+  Federated_Neural_Network    0.9701           0.8833        0.8653    0.8404              0.9720           0.9701       0.9677
+
+FEDERATED TRAINING
+  Rounds: 10
+  Final Global Accuracy:    0.9701
+  Final F1 Weighted:        0.9677
+  Final F1 Macro:           0.8404
+
+HOW TO RUN
+  Full pipeline:        python run_pipeline.py
+  Dashboard:            python src/dashboard/app.py
+  Tests:                python -m pytest tests/ -v
